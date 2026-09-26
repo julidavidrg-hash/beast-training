@@ -112,6 +112,12 @@ p{margin:0}
 .ex-meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;font-family:var(--mono);font-size:12px;color:var(--muted)}
 .ex-meta b{color:var(--text);font-weight:600}
 .ex-tag{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:var(--surface2);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.ex-thumb{width:54px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--surface2);border:1px solid var(--line);cursor:zoom-in}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.86);z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:10px}
+.lightbox img{max-width:100%;max-height:62vh;border-radius:12px;background:#fff}
+.lightbox .lb-name{color:#fff;font-weight:600;text-align:center;max-width:480px;font-size:15px}
+.lightbox .lb-note{text-align:center;max-width:420px;font-size:12px}
+.lightbox .lb-close{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:16px;width:40px;height:40px;border-radius:50%;background:var(--surface2);color:var(--text);font-size:18px;border:none;cursor:pointer}
 .hint{padding:9px 14px;font-size:13px;color:var(--muted);background:color-mix(in srgb,var(--pc) 7%,var(--surface));border-bottom:1px solid var(--line)}
 .hint b{color:var(--text)}
 .hint .tgt{font-family:var(--mono);color:var(--accent);font-weight:600}
@@ -131,8 +137,7 @@ p{margin:0}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
 .kpi .v{font-family:var(--display);font-weight:800;font-size:30px;line-height:1;margin-top:6px}
-.kpi .v small{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted);margin-left:3px}
-.kpi .s{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
+.kpi .v small{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted);margin-left:3px}.kpi .s{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:4px}
 .chart svg{width:100%;height:auto;display:block}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
@@ -147,7 +152,8 @@ td{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .mgrid label{display:flex;flex-direction:column;gap:4px}
 
 /* ANALYSIS */
-.verdict{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}.verdict:last-child{border-bottom:0}
+.verdict{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.verdict:last-child{border-bottom:0}
 .verdict .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-family:var(--mono)}
 .verdict.good .ic{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
 .verdict.warn .ic{background:color-mix(in srgb,var(--warn) 18%,transparent);color:var(--warn)}
@@ -270,8 +276,7 @@ const DAYS_HIP=[
   {k:"hangleg",n:"Elevación de piernas colgado (kg = 0 sin lastre)",s:3,r:[10,15],t:"i",g:"E2",rest:60,cue:"Retroversión de pelvis al subir; baja controlado sin balanceo."}]}
 ];
 const WEEKS=[
- {w:1,phase:"Adaptación",rir:"3",adj:"",note:"Calibra cargas: cada serie debe acabar con unas 3 repeticiones en reserva. Técnica ante todo."},
- {w:2,phase:"Acumulación",rir:"2",adj:"",note:"Sube carga donde hiciste el tope del rango. Quedan unas 2 reps en reserva."},
+ {w:1,phase:"Adaptación",rir:"3",adj:"",note:"Calibra cargas: cada serie debe acabar con unas 3 repeticiones en reserva. Técnica ante todo."}, {w:2,phase:"Acumulación",rir:"2",adj:"",note:"Sube carga donde hiciste el tope del rango. Quedan unas 2 reps en reserva."},
  {w:3,phase:"Acumulación +",rir:"1–2",adj:"c",note:"+1 serie en los básicos. Series duras, a 1–2 reps del fallo."},
  {w:4,phase:"Descarga",rir:"4",adj:"",deload:true,note:"Descarga: ~60% de las series y −10% de carga. Recuperas y consolidas."},
  {w:5,phase:"Bloque 2 · Base",rir:"2",adj:"",note:"Retoma las cargas de la semana 3 (o algo más). Arranca el segundo bloque."},
@@ -296,7 +301,8 @@ const DAYS_RECOMP=[
   {k:"legpressquad",n:"Prensa de piernas (pies bajos y juntos)",s:3,r:[10,15],t:"c",inc:5,rest:90,cue:"Rango completo sin despegar la zona lumbar del respaldo."},
   {k:"lunge",n:"Zancada caminando con mancuernas",s:3,r:[10,12],t:"c",unit:"kg/manc.",rest:90,cue:"Reps por pierna. Paso amplio, baja hasta que la rodilla trasera casi roce el suelo."},
   {k:"adductor",n:"Aductores en máquina",s:3,r:[12,15],t:"i",g:"C1",rest:15,cue:"Rango completo, sin rebote."},
-  {k:"abductor",n:"Abductores en máquina",s:3,r:[12,15],t:"i",g:"C2",rest:60,cue:"Controla la vuelta, no dejes caer el peso."},  {k:"plank",n:"Plancha abdominal con peso (kg = disco sobre la espalda, 0 si es sin peso)",s:3,r:[8,12],t:"i",rest:45,cue:"Cuerpo en línea recta, aprieta glúteo y abdomen. Si haces plancha isométrica, anota los segundos en «reps»."}]},
+  {k:"abductor",n:"Abductores en máquina",s:3,r:[12,15],t:"i",g:"C2",rest:60,cue:"Controla la vuelta, no dejes caer el peso."},
+  {k:"plank",n:"Plancha abdominal con peso (kg = disco sobre la espalda, 0 si es sin peso)",s:3,r:[8,12],t:"i",rest:45,cue:"Cuerpo en línea recta, aprieta glúteo y abdomen. Si haces plancha isométrica, anota los segundos en «reps»."}]},
  {id:3,name:"Tracción Superior",tag:"Espalda · Bíceps",pc:"var(--yellow)",ex:[
   {k:"seatrow",n:"Remo sentado en polea (agarre estrecho)",s:3,r:[10,12],t:"c",inc:2,rest:90,cue:"Pecho alto, tira hacia el abdomen y aprieta los omóplatos 1 s."},
   {k:"latpdneutral",n:"Jalón al pecho agarre neutro",s:3,r:[10,12],t:"c",rest:90,cue:"Pecho alto, baja la barra hasta la clavícula sin balancear el torso."},
@@ -326,6 +332,29 @@ const PROGRAMS={
  hipertrofia:{id:"hipertrofia",label:"Hipertrofia · Torso / Pierna × 2",goal:"gain",days:DAYS_HIP,mainLifts:MAIN_LIFTS_HIP,dowOff:DOW_OFF_HIP,dowNames:DOW_NAMES_HIP},
  recomp:{id:"recomp",label:"Recomposición corporal · 5 días",goal:"recomp",days:DAYS_RECOMP,mainLifts:MAIN_LIFTS_RECOMP,dowOff:DOW_OFF_RECOMP,dowNames:DOW_NAMES_RECOMP}
 };
+const EX_IMG_BASE="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/";
+const EX_IMG={
+ bench:"Barbell_Bench_Press_-_Medium_Grip",bbrow:"Bent_Over_Barbell_Row",dbohp:"Dumbbell_Shoulder_Press",
+ latpd:"Wide-Grip_Lat_Pulldown",latraise:"Side_Lateral_Raise",bbcurl:"Barbell_Curl",
+ ropepd:"Triceps_Pushdown_-_Rope_Attachment",squat:"Barbell_Squat",rdl:"Romanian_Deadlift",
+ legpress:"Leg_Press",lyingcurl:"Lying_Leg_Curls",standcalf:"Standing_Calf_Raises",
+ cablecrunch:"Cable_Crunch",incdb:"Incline_Dumbbell_Press",pullup:"Weighted_Pull_Ups",
+ dbrow:"One-Arm_Dumbbell_Row",cablefly:"Cable_Crossover",facepull:"Face_Pull",
+ hammer:"Hammer_Curls",skull:"EZ-Bar_Skullcrusher",hipthrust:"Barbell_Hip_Thrust",
+ bulgarian:"Split_Squat_with_Dumbbells",seatcurl:"Seated_Leg_Curl",legext:"Leg_Extensions",
+ seatcalf:"Seated_Calf_Raise",hangleg:"Hanging_Leg_Raise",
+ chestpress:"Leverage_Chest_Press",inclmach:"Incline_Dumbbell_Press",shpress:"Machine_Shoulder_Military_Press",
+ pecdeck:"Butterfly",latraisemach:"Cable_Seated_Lateral_Raise",tripushd:"Triceps_Pushdown",
+ gobsquat:"Goblet_Squat",legpressquad:"Leg_Press",lunge:"Dumbbell_Lunges",
+ adductor:"Cable_Hip_Adduction",abductor:"Thigh_Abductor",plank:"Plank",
+ seatrow:"Seated_Cable_Rows",latpdneutral:"Close-Grip_Front_Lat_Pulldown",rowmach:"Lying_T-Bar_Row",
+ reardelt:"Seated_Bent-Over_Rear_Delt_Raise",dbcurl:"Dumbbell_Alternate_Bicep_Curl",cablecurl:"Standing_Biceps_Cable_Curl",
+ rdldb:"Stiff-Legged_Dumbbell_Deadlift",hipabd:"Barbell_Hip_Thrust",cablecurlleg:"Standing_Leg_Curl",
+ legpresscalf:"Calf_Press_On_The_Leg_Press_Machine",backext:"Hyperextensions_Back_Extensions",kbswing:"One-Arm_Kettlebell_Swings",
+ fullsquat:"Dumbbell_Squat",funcrow:"Seated_Cable_Rows",funcpress:"Standing_Cable_Chest_Press",
+ stepbox:"Step-up_with_Knee_Raise",cablecrunchrec:"Cable_Crunch"
+};
+function exImgUrl(k){const id=EX_IMG[k];return id?EX_IMG_BASE+encodeURIComponent(id)+"/0.jpg":null}
 let DAYS,MAIN_LIFTS,DOW_OFF,DOW_NAMES,ALL_EX,PROG=null;
 function applyProgram(id){
   const p=PROGRAMS[id]||PROGRAMS.hipertrofia;
@@ -386,9 +415,7 @@ function restLabel(ex,day){
   if(ex.g&&ex.g.endsWith("1")){const mate=day.ex.find(e=>e.g===ex.g[0]+"2");return ex.rest<=20?`sin pausa → ${ex.g[0]}2`:`${ex.rest} s → ${ex.g[0]}2 (${mate?mate.n.split(" ")[0]:""})`}
   if(ex.g&&ex.g.endsWith("2"))return `${ex.rest} s → vuelve a ${ex.g[0]}1`;
   return ex.rest>=120?`${fmt(ex.rest/60,1)} min`:`${ex.rest} s`;
-}
-
-/* ================= COACH ================= */
+  }/* ================= COACH ================= */
 function lastPerf(k,w,d){
   const order=[];for(let W=1;W<=8;W++)for(let D=1;D<=DAYS.length;D++)order.push([W,D]);
   const idx=order.findIndex(([W,D])=>W===w&&D===d),curDl=!!WEEKS[w-1].deload;
@@ -445,7 +472,8 @@ function rateStatus(rate,gain){
   const gaining=(gain[0]+gain[1])>=0;
   if(gaining)return rate<gain[0]*0.8?"warn":rate>gain[1]*1.1?"bad":"good";
   if(rate>0)return "warn";
-  const r=Math.abs(rate),lo=Math.abs(gain[1]),hi=Math.abs(gain[0]);  return r<lo*0.8?"warn":r>hi*1.1?"bad":"good";
+  const r=Math.abs(rate),lo=Math.abs(gain[1]),hi=Math.abs(gain[0]);
+  return r<lo*0.8?"warn":r>hi*1.1?"bad":"good";
 }
 
 /* ================= API / SINCRONIZACIÓN ================= */
@@ -454,7 +482,15 @@ async function api(action,payload){
     const j=JSON.parse(txt);if(!j.ok)throw new Error(j.error||"Error del servidor");return j}
   const url=apiUrl();if(!url)throw new Error("Base de datos no configurada");
   const body=JSON.stringify(Object.assign({action},payload));
-  const txt=await new Promise((ok,ko)=>{const xhr=new XMLHttpRequest();xhr.open("POST",url,true);xhr.timeout=20000;xhr.onload=()=>{(xhr.status>=200&&xhr.status<400)?ok(xhr.responseText):ko(new Error("HTTP "+xhr.status))};xhr.onerror=()=>ko(new Error("Failed to fetch"));xhr.ontimeout=()=>ko(new Error("Failed to fetch"));xhr.send(body)});
+  const txt=await new Promise((ok,ko)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open("POST",url,true);
+    xhr.timeout=20000;
+    xhr.onload=()=>{(xhr.status>=200&&xhr.status<400)?ok(xhr.responseText):ko(new Error("HTTP "+xhr.status))};
+    xhr.onerror=()=>ko(new Error("Failed to fetch"));
+    xhr.ontimeout=()=>ko(new Error("Failed to fetch"));
+    xhr.send(body);
+  });
   const j=JSON.parse(txt);if(!j.ok)throw new Error(j.error||"Error del servidor");return j;
 }
 const cacheKey=()=>"bt-cache-"+(AUTH?.name||"").toLowerCase();
@@ -517,8 +553,7 @@ function renderHero(){
   const hk=$("#heroKicker");if(hk)hk.textContent=(PROGRAMS[PROG]?.label||"Hipertrofia")+" · 8 semanas";
   if(!AUTH){$("#heroStats").innerHTML=`<span class="hero-stat">Programa basado en evidencia · sesiones de <b>menos de 1 h 39</b></span>`;$("#plates").innerHTML=[...Array(8)].map((_,i)=>`<div class="plate${i===3?" dl":""}"></div>`).join("");return}
   const done=sessionsDone(),cw=curWeek(),lb=latestBw(),base=baselineBw(),started=isoToday()>=cfg().startDate;
-  $("#heroStats").innerHTML=`<span class="hero-stat"><b>${esc(AUTH.name)}</b></span><span class="hero-stat">${started?`Semana <b>${cw}</b>/8 · ${esc(WEEKS[cw-1].phase)}`:`Empieza el <b>${fmtDate(cfg().startDate,{weekday:"long",day:"numeric",month:"long"})}</b>`}</span>
-   <span class="hero-stat">Sesiones <b>${done}</b>/${8*DAYS.length}</span><span class="hero-stat">Peso <b>${fmt(lb?lb.kg:base)} kg</b>${lb?` (${sgn(lb.kg-base)})`:""}</span>`;
+  $("#heroStats").innerHTML=`<span class="hero-stat"><b>${esc(AUTH.name)}</b></span><span class="hero-stat">${started?`Semana <b>${cw}</b>/8 · ${esc(WEEKS[cw-1].phase)}`:`Empieza el <b>${fmtDate(cfg().startDate,{weekday:"long",day:"numeric",month:"long"})}</b>`}</span>   <span class="hero-stat">Sesiones <b>${done}</b>/${8*DAYS.length}</span><span class="hero-stat">Peso <b>${fmt(lb?lb.kg:base)} kg</b>${lb?` (${sgn(lb.kg-base)})`:""}</span>`;
   let h="";for(let w=1;w<=8;w++){let n=0;for(let d=1;d<=DAYS.length;d++)if(S.sessions[sid(w,d)]?.done)n++;h+=`<div class="plate${WEEKS[w-1].deload?" dl":""}" title="Semana ${w}: ${n}/${DAYS.length}"><i style="width:${n*100/DAYS.length}%"></i></div>`}
   $("#plates").innerHTML=h;
 }
@@ -593,12 +628,22 @@ function renderEx(ex,i,w,d,s,day){
       <button class="chk" data-act="chk" data-e="${ex.k}" data-i="${j}" aria-pressed="${!!x.ok}" aria-label="Serie ${j+1} hecha">✓</button></div>`}
   const label=ex.g?`<span class="ss">${ex.g}</span>`:`<span class="ex-n">${String(i+1).padStart(2,"0")}</span>`;
   const blk=ex.g&&ex.g.endsWith("1")?`<div class="hint" style="background:var(--surface2)">${ex.t==="c"?"<b>Series alternas:</b> haz una serie de "+ex.g[0]+"1, descansa, una de "+ex.g[0]+"2, descansa y repite. Mismo estímulo, ~30% menos tiempo.":"<b>Superserie:</b> "+ex.g[0]+"1 y "+ex.g[0]+"2 seguidos, luego descansa. Músculos distintos, así que no pierdes rendimiento."}</div>`:"";
+  const imgUrl=exImgUrl(ex.k);
+  const thumb=imgUrl?`<img class="ex-thumb" src="${imgUrl}" alt="Foto: ${esc(ex.n)}" loading="lazy" data-act="ex-img" data-src="${imgUrl}" data-name="${esc(ex.n)}" onerror="this.remove()">`:"";
   return `<article class="ex" style="--pc:${day.pc}">
-   <div class="ex-h">${label}<div class="ex-t"><h3>${esc(ex.n)}</h3>
-     <div class="ex-meta"><span><b>${n}</b> × <b>${ex.r[0]}–${ex.r[1]}</b></span><span>RIR <b>${WEEKS[w-1].rir}</b></span><span>Descanso <b>${restLabel(ex,day)}</b></span></div></div>     <span class="ex-tag">${ex.t==="c"?"Básico":"Aislado"}</span></div>
+   <div class="ex-h">${label}${thumb}<div class="ex-t"><h3>${esc(ex.n)}</h3>
+     <div class="ex-meta"><span><b>${n}</b> × <b>${ex.r[0]}–${ex.r[1]}</b></span><span>RIR <b>${WEEKS[w-1].rir}</b></span><span>Descanso <b>${restLabel(ex,day)}</b></span></div></div>
+     <span class="ex-tag">${ex.t==="c"?"Básico":"Aislado"}</span></div>
    ${blk}<div class="hint">${sg.html}</div><div class="sets">${rows}</div>
    <details class="cue"><summary>Técnica</summary><p>${esc(ex.cue)}</p></details></article>`;
 }
+function showExImg(src,name){
+  let el=$("#lightbox");
+  if(!el){el=document.createElement("div");el.id="lightbox";el.className="lightbox";el.addEventListener("click",e=>{if(e.target===el)hideExImg()});document.body.appendChild(el)}
+  el.innerHTML=`<button class="lb-close" data-act="lb-close" aria-label="Cerrar">✕</button><img src="${esc(src)}" alt="${esc(name)}"><div class="lb-name">${esc(name)}</div><div class="lb-note muted">Foto ilustrativa (puede variar según la máquina de tu gimnasio)</div>`;
+  el.hidden=false;
+}
+function hideExImg(){const el=$("#lightbox");if(el)el.hidden=true}
 
 /* ---- TEMPORIZADOR DE DESCANSO ---- */
 let rest=null,tick=null,audioCtx=null;
@@ -647,8 +692,7 @@ function renderProg(){
      <p class="muted" style="font-size:12.5px;margin-top:6px">1RM estimado con la fórmula de Epley (kg × (1 + reps/30)) de tu mejor serie de la semana.</p></div>
    <div class="card chart"><div class="row" style="justify-content:space-between"><h3>Volumen semanal</h3><span class="lbl">kg × reps</span></div>${tonChart()}</div>
    <div class="card"><h3 style="margin-bottom:8px">Resumen por semana</h3><div class="tablewrap"><table><thead><tr><th>Semana</th><th>Peso medio</th><th>Sesiones</th><th>Duración media</th><th>Series</th><th>Volumen</th><th>1RM ${HLN[0]}</th><th>1RM ${HLN[1]}</th></tr></thead><tbody>${rows}</tbody></table></div></div>
-   <div class="card"><h3>Medidas corporales</h3><p class="muted" style="font-size:13px;margin:4px 0 8px">Mide por la mañana, cinta horizontal y sin apretar. Cintura a la altura del ombligo; brazo y muslo en la parte más ancha.</p>${mt}</div>
-  </div>`;
+   <div class="card"><h3>Medidas corporales</h3><p class="muted" style="font-size:13px;margin:4px 0 8px">Mide por la mañana, cinta horizontal y sin apretar. Cintura a la altura del ombligo; brazo y muslo en la parte más ancha.</p>${mt}</div>  </div>`;
 }
 function svgFrame(W,H,pad,yMin,yMax,xMin,xMax,yTicks,xTicks,yF){
   const X=x=>pad.l+(x-xMin)/(xMax-xMin||1)*(W-pad.l-pad.r),Y=y=>H-pad.b-(y-yMin)/(yMax-yMin||1)*(H-pad.t-pad.b);let g="";
@@ -744,7 +788,8 @@ function verdicts(D){
 }
 function renderAna(){
   const D=monthData(ui.month),V=verdicts(D);
-  const lt=D.lifts.length?`<div class="tablewrap"><table><thead><tr><th>Ejercicio</th><th>1RM inicio</th><th>1RM final</th><th>Cambio</th></tr></thead><tbody>${D.lifts.map(l=>`<tr><td>${esc(l.n)}</td><td>${fmt(l.a)}</td><td>${fmt(l.b)}</td><td style="color:${l.pct>=2?"var(--good)":l.pct>=0?"var(--warn)":"var(--bad)"}">${sgn(l.pct,1)}%</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted" style="font-size:13.5px">Necesitas al menos dos semanas con registros en los básicos.</p>`;  return `<div class="stack">
+  const lt=D.lifts.length?`<div class="tablewrap"><table><thead><tr><th>Ejercicio</th><th>1RM inicio</th><th>1RM final</th><th>Cambio</th></tr></thead><tbody>${D.lifts.map(l=>`<tr><td>${esc(l.n)}</td><td>${fmt(l.a)}</td><td>${fmt(l.b)}</td><td style="color:${l.pct>=2?"var(--good)":l.pct>=0?"var(--warn)":"var(--bad)"}">${sgn(l.pct,1)}%</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted" style="font-size:13.5px">Necesitas al menos dos semanas con registros en los básicos.</p>`;
+  return `<div class="stack">
    <div class="row" style="justify-content:space-between"><h2>Análisis del mes</h2><div class="seg" role="group"><button data-act="month" data-v="1" aria-pressed="${ui.month===1}">Mes 1 · S1–4</button><button data-act="month" data-v="2" aria-pressed="${ui.month===2}">Mes 2 · S5–8</button></div></div>
    <div class="kpis">
     <div class="kpi"><div class="lbl">Sesiones</div><div class="v">${D.done}<small>/${DAYS.length*4}</small></div><div class="s">${D.logged} con series registradas</div></div>
@@ -786,8 +831,7 @@ function renderGuide(){
      <div class="kpi"><div class="lbl">Calorías</div><div class="v">${n.kcal.toLocaleString("es-ES")}<small>kcal</small></div><div class="s">${n.goal==="recomp"?"déficit ≈ −200 a −300":"superávit ≈ +250–300"}</div></div>
      <div class="kpi"><div class="lbl">Proteína</div><div class="v">${n.pro[0]}–${n.pro[1]}<small>g</small></div><div class="s">${n.goal==="recomp"?"2,0–2,4":"1,8–2,2"} g/kg</div></div>
      <div class="kpi"><div class="lbl">Carbohidratos</div><div class="v">~${n.carb}<small>g</small></div><div class="s">el resto de calorías</div></div>
-     <div class="kpi"><div class="lbl">Grasas</div><div class="v">~${n.fat}<small>g</small></div><div class="s">≈ 0,9 g/kg</div></div>
-    </div>
+     <div class="kpi"><div class="lbl">Grasas</div><div class="v">~${n.fat}<small>g</small></div><div class="s">≈ 0,9 g/kg</div></div>    </div>
     <ul>
      <li><b>Objetivo de peso:</b> ${n.goal==="recomp"?`${sgn(n.gain[0],2)} a ${sgn(n.gain[1],2)} kg por semana (pérdida lenta y controlada). Si en 2 semanas no bajas, −150 kcal; si bajas más rápido de la cuenta, +150 kcal para proteger el músculo.`:`${sgn(n.gain[0],2)} a ${sgn(n.gain[1],2)} kg por semana. Si en 2 semanas no subes, +200 kcal; si subes más rápido, −200 kcal.`} La pestaña Análisis te lo indica.</li>
      <li><b>Proteína:</b> 4–5 tomas de 30–40 g. Fuentes: pollo, pavo, ternera, huevos, legumbres, tofu y proteína en polvo (whey o vegetal si no tomas lácteos).</li>
@@ -832,6 +876,8 @@ document.addEventListener("click",async e=>{
   const t=e.target.closest("[data-tab],[data-act]");if(!t)return;
   if(t.dataset.tab){ui.tab=t.dataset.tab;saveUi();render();window.scrollTo({top:0});return}
   const a=t.dataset.act,w=ui.week,d=ui.day;
+  if(a==="ex-img"){showExImg(t.dataset.src,t.dataset.name);return}
+  if(a==="lb-close"){hideExImg();return}
   if(a==="auth-mode"){ui.authMode=t.dataset.v;render();return}
   if(a==="api-save"){const v=$("#apiIn").value.trim();if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(v)){$("#authErr").textContent="La URL debe empezar por https://script.google.com/";return}LS.set("bt-api",v);render();return}
   if(a==="week"){ui.week=+t.dataset.v;render();return}
