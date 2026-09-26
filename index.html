@@ -453,8 +453,9 @@ async function api(action,payload){
   if(GAS){const txt=await new Promise((ok,ko)=>google.script.run.withSuccessHandler(ok).withFailureHandler(e=>ko(new Error(e&&e.message||"Sin conexión con Google"))).apiCall(JSON.stringify(Object.assign({action},payload))));
     const j=JSON.parse(txt);if(!j.ok)throw new Error(j.error||"Error del servidor");return j}
   const url=apiUrl();if(!url)throw new Error("Base de datos no configurada");
-  const res=await fetch(url,{method:"POST",body:JSON.stringify(Object.assign({action},payload)),redirect:"follow"});
-  const j=await res.json();if(!j.ok)throw new Error(j.error||"Error del servidor");return j;
+  const body=JSON.stringify(Object.assign({action},payload));
+  const txt=await new Promise((ok,ko)=>{const xhr=new XMLHttpRequest();xhr.open("POST",url,true);xhr.timeout=20000;xhr.onload=()=>{(xhr.status>=200&&xhr.status<400)?ok(xhr.responseText):ko(new Error("HTTP "+xhr.status))};xhr.onerror=()=>ko(new Error("Failed to fetch"));xhr.ontimeout=()=>ko(new Error("Failed to fetch"));xhr.send(body)});
+  const j=JSON.parse(txt);if(!j.ok)throw new Error(j.error||"Error del servidor");return j;
 }
 const cacheKey=()=>"bt-cache-"+(AUTH?.name||"").toLowerCase();
 function cacheSave(){LS.set(cacheKey(),{S,PROFILE})}
